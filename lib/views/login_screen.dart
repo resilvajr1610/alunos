@@ -1,6 +1,4 @@
 import '../utils/export.dart';
-import '../widgets/buttom_custom.dart';
-import '../widgets/input.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -30,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 email: _controllerEmail.text.trim(),
                 password: _controllerPassword.text.trim())
             .then((auth) async {
-          print("logado");
           Navigator.pushReplacementNamed(context, "/home");
         });
       } on FirebaseAuthException catch (e) {

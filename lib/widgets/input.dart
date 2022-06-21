@@ -36,7 +36,6 @@ class Input extends StatelessWidget {
   Widget build(BuildContext context) {
 
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
 
     return Container(
       alignment: Alignment.topCenter,
@@ -76,7 +75,7 @@ class Input extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onTap,
-            child: Icon(obscure?icons:Icons.visibility,size: sizeIcon,color: colorIcon)
+            child: Icon(obscure?Icons.visibility:icons,size: sizeIcon,color: colorIcon)
           ),
         ],
       ),

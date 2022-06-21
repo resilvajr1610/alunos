@@ -29,13 +29,13 @@ class ButtonCustom extends StatelessWidget {
 
     return ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: this.colorButton,
+            primary: colorButton,
             minimumSize: Size(widthCustom*width, heightCustom*height),
             side: BorderSide(width: 3,color: colorBorder),
           ),
         onPressed: onPressed,
         child: TextCustom(
-          text: 'Entrar',
+          text: text,
           color: colorText,
         )
     );

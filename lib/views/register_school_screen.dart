@@ -8,13 +8,239 @@ class RegisterSchoolScreen extends StatefulWidget {
 }
 
 class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
+
+  var _controllerStream = StreamController<QuerySnapshot>.broadcast();
+  final _controllerSearch = TextEditingController();
+  final _controllerItem = TextEditingController();
+  RegisterModel _registerModel = RegisterModel();
+  FirebaseFirestore db = FirebaseFirestore.instance;
+  List _allResults = [];
+  List _resultsList = [];
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  _showDialog(String id, String item) {
+
+    if(item==""){
+      _controllerItem.clear();
+    }else{
+      _controllerItem.text = item;
+    }
+
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          double width = MediaQuery.of(context).size.width;
+          return ShowDialogCustom(
+            title: item==""?'Cadastrar Escola':'Alterar Escola',
+            hint: 'Nome da escola',
+            controller: _controllerItem,
+            list: [
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 15),
+                width: width*0.22,
+                height: 30,
+                child: ButtonCustom(
+                  onPressed: () => item==""?_saveFirebase():_updateItem(id,item,_controllerItem.text),
+                    text: item==""?'Salvar':'Alterar',
+                ),
+              ),
+              SizedBox(width: 20),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 15),
+                width: width*0.22,
+                height: 30,
+                child: ButtonCustom(
+                  onPressed: () => Navigator.pop(context),
+                  text: 'Cancelar',
+                  colorButton: PaletteColor.greyButtom,
+                  colorBorder: PaletteColor.greyButtom,
+                ),
+              ),
+
+            ],
+          );
+        });
+  }
+
+  _saveFirebase(){
+    if(_controllerItem.text.isNotEmpty){
+      _registerModel = RegisterModel.createId('schools');
+
+      _registerModel.doc = _controllerItem.text;
+
+      db
+          .collection("schools")
+          .doc(_registerModel.doc)
+          .set(_registerModel.toMap('schools'))
+          .then((value) {
+        db
+            .collection('schoolsSearch')
+            .doc(_registerModel.id)
+            .set(_registerModel.toMap('schools'))
+            .then((value) {
+          Navigator.pop(context);
+          _controllerItem.clear();
+          Navigator.pushReplacementNamed(context, "/register-school");
+        });
+      });
+    }else{
+      setState(() {
+        showSnackBar(context, "Nome da escola está vazio", _scaffoldKey);
+      });
+    }
+  }
+
+  _deleteItem(String id, String item){
+    db
+        .collection('schools')
+        .doc(item)
+        .delete().then((value){
+      db
+        .collection('schoolsSearch')
+            .doc(id)
+            .delete().then((value) => Navigator.pushReplacementNamed(context, "/register-school"));
+
+    });
+  }
+
+  _updateItem(String id, String itemOld, String itemNew){
+    if(_controllerItem.text.isNotEmpty) {
+      db
+          .collection('schools')
+          .doc(itemOld)
+          .delete().then((value) {
+        db
+            .collection('schools')
+            .doc(itemNew)
+            .set({
+          'id': id,
+          'school': itemNew
+        })
+            .then((value) {
+          db
+              .collection('schoolsSearch')
+              .doc(id)
+              .update({
+            'id': id,
+            'school': itemNew
+          }).then((value) =>
+              Navigator.pushReplacementNamed(context, "/register-school"));
+        });
+      });
+    }else{
+      setState(() {
+        showSnackBar(context, "Nome da escola está vazio", _scaffoldKey);
+      });
+    }
+  }
+
+  _data() async {
+    var data = await db.collection("schoolsSearch").get();
+
+    setState(() {
+      _allResults = data.docs;
+    });
+    resultSearchList();
+    return "complete";
+  }
+  resultSearchList() {
+    var showResults = [];
+
+    if (_controllerSearch.text != "") {
+      for (var items in _allResults) {
+        var brands = RegisterModel.fromSnapshot(items,'school').doc.toLowerCase();
+
+        if (brands.contains(_controllerSearch.text.toLowerCase())) {
+          showResults.add(items);
+        }
+      }
+    } else {
+      showResults = List.from(_allResults);
+    }
+    setState(() {
+      _resultsList = showResults;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _data();
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: PaletteColor.primaryColor,
         centerTitle: true,
         title: TextCustom(text: 'ESCOLA',size: 20,color: PaletteColor.white,),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(width: width*0.07),
+                Input(
+                  controller: _controllerSearch,
+                  hint: 'Pesquisar',
+                  icons: Icons.search,
+                  colorIcon: PaletteColor.primaryColor,
+                  sizeIcon: 25.0,
+                  background: PaletteColor.white,
+                  colorBorder: PaletteColor.greyBorder,
+                ),
+                SizedBox(width: width*0.05),
+                AddButtom(onPressed: ()=>_showDialog('',''),
+                )
+              ],
+            ),
+            SizedBox(height: 10),
+            Container(
+              height: height * 0.5,
+              child: StreamBuilder(
+                stream: _controllerStream.stream,
+                builder: (context, snapshot) {
+
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                    case ConnectionState.done:
+                      if(_resultsList.length == 0){
+                        return Center(
+                            child: Text('Sem dados!',style: TextStyle(fontSize: 20),)
+                        );
+                      }else {
+                        return ListView.builder(
+                            itemCount: _resultsList.length,
+                            itemBuilder: (BuildContext context, index) {
+                              DocumentSnapshot item = _resultsList[index];
+
+                              String id = item["id"];
+                              String school = item["school"];
+
+                              return ItemList(
+                                text: school,
+                                onTapDelete: ()=>_deleteItem(id,school),
+                                onTapEdit: ()=>_showDialog(id,school),
+                              );
+                            });
+                      }
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

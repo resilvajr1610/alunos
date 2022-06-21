@@ -7,7 +7,7 @@ void main()async{
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: HomeScreen(),
+    //home: RegisterSchoolScreen(),
     initialRoute:'/login',
     onGenerateRoute: Routes.generateRoute,
   ));

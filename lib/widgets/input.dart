@@ -14,6 +14,7 @@ class Input extends StatelessWidget {
   final background;
   final obscure;
   final maxline;
+  final enable;
   VoidCallback? onTap=(){};
 
   Input({
@@ -30,6 +31,7 @@ class Input extends StatelessWidget {
     this.background = PaletteColor.greyLight,
     this.obscure = false,
     this.onTap,
+    this.enable = true,
   });
 
   @override
@@ -52,15 +54,16 @@ class Input extends StatelessWidget {
         children: [
           Expanded(
             child: TextFormField(
+              enabled: enable,
               obscureText: obscure,
-              controller: this.controller,
+              controller: controller,
               textAlign: TextAlign.start,
-              keyboardType: this.keyboardType,
+              keyboardType: keyboardType,
               textAlignVertical: TextAlignVertical.center,
               maxLines: maxline,
               style: TextStyle(
                 color: Colors.black54,
-                fontSize: this.fonts,
+                fontSize: fonts,
                 fontFamily: 'Nunito'
               ),
               decoration: InputDecoration(

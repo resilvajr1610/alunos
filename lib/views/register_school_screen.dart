@@ -17,6 +17,7 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
   List _allResults = [];
   List _resultsList = [];
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  Future? resultsLoaded;
 
   _showDialog(String id, String item) {
 
@@ -35,6 +36,26 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
             title: item==""?'Cadastrar Escola':'Alterar Escola',
             hint: 'Nome da escola',
             controller: _controllerItem,
+            listContent: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                      height: 30,
+                      width: 300,
+                      child: TextCustom(text: 'Escola')
+                  ),
+                  Input(
+                      obscure: false,
+                      keyboardType: TextInputType.text,
+                      controller: _controllerItem,
+                      hint: 'Nome da Escola',
+                      fonts: 20
+                  ),
+                  SizedBox(height: 10)
+                ],
+              ),
+            ),
             list: [
               Container(
                 margin: EdgeInsets.symmetric(vertical: 15),
@@ -74,16 +95,10 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
           .doc(_registerModel.doc)
           .set(_registerModel.toMap('schools'))
           .then((value) {
-        db
-            .collection('schoolsSearch')
-            .doc(_registerModel.id)
-            .set(_registerModel.toMap('schools'))
-            .then((value) {
           Navigator.pop(context);
           _controllerItem.clear();
           Navigator.pushReplacementNamed(context, "/register-school");
         });
-      });
     }else{
       setState(() {
         showSnackBar(context, "Nome da escola está vazio", _scaffoldKey);
@@ -95,13 +110,7 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
     db
         .collection('schools')
         .doc(item)
-        .delete().then((value){
-      db
-        .collection('schoolsSearch')
-            .doc(id)
-            .delete().then((value) => Navigator.pushReplacementNamed(context, "/register-school"));
-
-    });
+        .delete().then((value) => Navigator.pushReplacementNamed(context, "/register-school"));
   }
 
   _updateItem(String id, String itemOld, String itemNew){
@@ -117,17 +126,9 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
           'id': id,
           'school': itemNew
         })
-            .then((value) {
-          db
-              .collection('schoolsSearch')
-              .doc(id)
-              .update({
-            'id': id,
-            'school': itemNew
-          }).then((value) =>
+            .then((value) =>
               Navigator.pushReplacementNamed(context, "/register-school"));
         });
-      });
     }else{
       setState(() {
         showSnackBar(context, "Nome da escola está vazio", _scaffoldKey);
@@ -136,7 +137,7 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
   }
 
   _data() async {
-    var data = await db.collection("schoolsSearch").get();
+    var data = await db.collection("schools").get();
 
     setState(() {
       _allResults = data.docs;
@@ -144,6 +145,11 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
     resultSearchList();
     return "complete";
   }
+
+  _search() {
+    resultSearchList();
+  }
+
   resultSearchList() {
     var showResults = [];
 
@@ -167,6 +173,20 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
   void initState() {
     super.initState();
     _data();
+    _controllerSearch.addListener(_search);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controllerSearch.removeListener(_search);
+    _controllerSearch.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    resultsLoaded = _search();
   }
 
   @override

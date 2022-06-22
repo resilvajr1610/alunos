@@ -11,7 +11,6 @@ class RegisterModel{
 
   RegisterModel.fromDocumentSnapshot(DocumentSnapshot documentSnapshot){
     this.id = documentSnapshot.id;
-    this.doc = documentSnapshot["cor"];
   }
 
   RegisterModel.createId(String collection){

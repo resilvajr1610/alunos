@@ -16,24 +16,25 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
   List _resultsList = [];
   Future? resultsLoaded;
 
-  _deleteItem(String id, String item){
-    db
-        .collection('class')
-        .doc(item)
-        .delete().then((value){
-      db
-          .collection('classSearch')
-          .doc(id)
-          .delete().then((value) => Navigator.pushReplacementNamed(context, "/register-student"));
-
-    });
-  }
+  // _deleteItem(){
+  //   db
+  //       .collection('class')
+  //       .doc(item)
+  //       .delete().then((value){
+  //     db
+  //         .collection('classSearch')
+  //         .doc(id)
+  //         .delete().then((value) => Navigator.pushReplacementNamed(context, "/register-student"));
+  //
+  //   });
+  // }
 
   _data() async {
-    var data = await db.collection("classSearch").get();
+    var data = await db.collection("classList").get();
 
     setState(() {
       _allResults = data.docs;
+      print(_allResults.length);
     });
     resultSearchList();
     return "complete";
@@ -137,12 +138,11 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
                             itemBuilder: (BuildContext context, index) {
                               DocumentSnapshot item = _resultsList[index];
 
-                              String id = item["id"];
-                              String itemClass = item["class"];
+                              String id = item['id'];
 
                               return ItemList(
-                                text: itemClass,
-                                onTapDelete: ()=>_deleteItem(id,itemClass),
+                                text: id,
+                                onTapDelete: (){},
                                 onTapEdit: ()=>Navigator.pushNamed(context,"/register-student"),
                               );
                             });

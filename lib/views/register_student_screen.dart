@@ -30,14 +30,14 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
     ),
   );
 
-  _showDialog(String id, String item) {
+  _showDialog(String number, String item) {
 
     if(item==""){
       _controllerItem.clear();
       _controllerNumber.clear();
     }else{
       _controllerItem.text = item;
-      _controllerNumber.text = id;
+      _controllerNumber.text = number;
     }
 
     showDialog(
@@ -87,7 +87,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                 width: width*0.22,
                 height: 30,
                 child: ButtonCustom(
-                  onPressed: () => item==""?_saveFirebase():_updateItem(id,item,_controllerItem.text),
+                  onPressed: () => item==""?_saveFirebase():_updateItem(number,item,_controllerItem.text),
                   text: item==""?'Salvar':'Alterar',
                 ),
               ),
@@ -110,9 +110,6 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
   }
 
   _saveFirebase(){
-    // if(_registerModel.id==""){
-    //   _registerModel = RegisterModel.createId('class');
-    // }
     String id = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
     if(id != ""){
       if(_controllerItem.text.isNotEmpty){
@@ -142,10 +139,17 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
               'class'   : _controllerClass.text,
               'time'    : DateTime.now()
 
-            }).then((value) {
-              Navigator.pop(context);
-              _controllerItem.clear();
-              _controllerNumber.clear();
+            }).then((value){
+              db
+                  .collection("classList")
+                  .doc(id)
+                  .set({
+                'id'    :   id,
+              }).then((value) {
+                Navigator.pop(context);
+                _controllerItem.clear();
+                _controllerNumber.clear();
+              });
             });
           });
         }else{
@@ -160,7 +164,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
 
   }
 
-  _updateItem(String id, String itemOld, String itemNew){
+  _updateItem(String number, String itemOld, String itemNew){
 
     String idNew = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
     print(idNew);
@@ -175,40 +179,42 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
             db
                 .collection('class')
                 .doc(idNew)
-                .collection(id)
-                .doc(idNew)
-                .delete();
-          }).then((value) {
-            db
-                .collection('students')
-                .doc(itemNew)
-                .set({
-              'number': int.parse(_controllerNumber.text),
-              'student': itemNew,
-              'class'  : _controllerClass.text,
-              'period'  : selectedPeriod,
-              'school'  : selectedScholl,
-              'time'    : DateTime.now()
-            }).then((value){
-              db
-                  .collection("class")
-                  .doc(idNew)
-                  .collection(_controllerNumber.text)
-                  .doc(itemNew)
-                  .set({
-                    'number'  :int.parse(_controllerNumber.text),
-                    'student' : _controllerItem.text,
-                    'school'  : selectedScholl,
-                    'period'  : selectedPeriod,
-                    'class'   : _controllerClass.text,
-                    'time'    : DateTime.now()
+                .collection(number)
+                .doc(itemOld)
+                .delete().then((value) {
+                db
+                    .collection('students')
+                    .doc(itemNew)
+                    .set({
+                  'id'      :idNew,
+                  'number'  : int.parse(_controllerNumber.text),
+                  'student' : itemNew,
+                  'class'   : _controllerClass.text,
+                  'period'  : selectedPeriod,
+                  'school'  : selectedScholl,
+                  'time'    : DateTime.now()
+                }).then((value){
+                    db
+                        .collection("class")
+                        .doc(idNew)
+                        .collection(_controllerNumber.text)
+                        .doc(itemNew)
+                        .set({
+                      'id'      :idNew,
+                      'number'  :int.parse(_controllerNumber.text),
+                      'student' : _controllerItem.text,
+                      'school'  : selectedScholl,
+                      'period'  : selectedPeriod,
+                      'class'   : _controllerClass.text,
+                      'time'    : DateTime.now()
+                    });
+                  }).then((value){
+                    Navigator.pop(context);
+                    _controllerNumber.clear();
+                    _controllerItem.clear();
                   });
-            }).then((value){
-              Navigator.pop(context);
-              _controllerNumber.clear();
-              _controllerItem.clear();
-            });
-          });
+                });
+              });
 
         }else{
           showSnackBar(context, "Selecione uma escola", _scaffoldKey);
@@ -221,7 +227,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
     }
   }
 
-  _deleteItem(String id,String item){
+  _deleteItem(String number,String item){
 
     String idDelete = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
 
@@ -231,10 +237,15 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
         .delete().then((value){
       db
           .collection("class")
-          .doc(_registerModel.id)
-          .collection(idDelete)
+          .doc(idDelete)
+          .collection(number)
           .doc(item)
-          .delete();
+          .delete().then((value){
+        db
+            .collection("classList")
+            .doc(idDelete)
+            .delete();
+      });
     });
   }
 

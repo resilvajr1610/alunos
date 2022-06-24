@@ -34,8 +34,6 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
           double width = MediaQuery.of(context).size.width;
           return ShowDialogCustom(
             title: item==""?'Cadastrar Escola':'Alterar Escola',
-            hint: 'Nome da escola',
-            controller: _controllerItem,
             listContent: Container(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -46,11 +44,11 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
                       child: TextCustom(text: 'Escola')
                   ),
                   Input(
-                      obscure: false,
-                      keyboardType: TextInputType.text,
-                      controller: _controllerItem,
-                      hint: 'Nome da Escola',
-                      fonts: 20
+                    obscure: false,
+                    keyboardType: TextInputType.text,
+                    controller: _controllerItem,
+                    hint: 'Nome da Escola',
+                    fonts: 20,
                   ),
                   SizedBox(height: 10)
                 ],
@@ -217,6 +215,7 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
                   sizeIcon: 25.0,
                   background: PaletteColor.white,
                   colorBorder: PaletteColor.greyBorder,
+                  inputFormatters: [],
                 ),
                 SizedBox(width: width*0.05),
                 AddButtom(onPressed: ()=>_showDialog('',''),
@@ -237,7 +236,7 @@ class _RegisterSchoolScreenState extends State<RegisterSchoolScreen> {
                     case ConnectionState.done:
                       if(_resultsList.length == 0){
                         return Center(
-                            child: Text('Sem dados!',style: TextStyle(fontSize: 20),)
+                            child: TextCustom(text: 'Nenhuma escola cadastrada!',size: 20.0)
                         );
                       }else {
                         return ListView.builder(

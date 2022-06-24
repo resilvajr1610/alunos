@@ -16,6 +16,7 @@ class Input extends StatelessWidget {
   final maxline;
   final enable;
   VoidCallback? onTap=(){};
+  List <TextInputFormatter>? inputFormatters=[];
 
   Input({
     required this.controller,
@@ -32,6 +33,7 @@ class Input extends StatelessWidget {
     this.obscure = false,
     this.onTap,
     this.enable = true,
+    this.inputFormatters
   });
 
   @override
@@ -61,6 +63,7 @@ class Input extends StatelessWidget {
               keyboardType: keyboardType,
               textAlignVertical: TextAlignVertical.center,
               maxLines: maxline,
+              inputFormatters: inputFormatters,
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: fonts,

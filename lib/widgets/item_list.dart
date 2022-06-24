@@ -19,7 +19,7 @@ class ItemList extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Divider(),
+        onTapDelete!=null?Divider():Container(),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5),
           child: Row(
@@ -30,18 +30,19 @@ class ItemList extends StatelessWidget {
                 child: TextCustom(text: text,color: PaletteColor.greyText,size: 16.0,)
               ),
               Spacer(),
-              IconButton(
+              onTapDelete!=null?IconButton(
                 onPressed: onTapEdit,
                 icon: Icon(Icons.edit,color: PaletteColor.blueLight,size: 30),
-              ),
+              ):Container(),
               SizedBox(width: width*0.05),
-              IconButton(
+              onTapDelete!=null?IconButton(
                 onPressed: onTapDelete,
                 icon: Icon(Icons.delete_forever,color: PaletteColor.red,size: 30,)
-              ),
+              ):Container(),
             ],
           ),
-        )
+        ),
+        onTapDelete==null?Divider():Container(),
       ],
     );
   }

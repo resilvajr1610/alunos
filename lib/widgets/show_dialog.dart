@@ -1,17 +1,13 @@
 import '../utils/export.dart';
 
 class ShowDialogCustom extends StatelessWidget {
-  final TextEditingController controller;
   final String title;
-  final String hint;
   final List<Widget> list;
   final listContent;
 
   ShowDialogCustom({
-    required this.controller,
     required this.title,
     required this.list,
-    required this.hint,
     required this.listContent
   });
 

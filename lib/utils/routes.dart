@@ -23,11 +23,23 @@ class Routes{
           );
         case "/register-student" :
           return MaterialPageRoute(
-              builder: (_) => RegisterStudentScreen()
+              builder: (_) => RegisterStudentScreen(idClass: args as String)
           );
         case "/register-class" :
           return MaterialPageRoute(
               builder: (_) => RegisterClassScreen()
+          );
+        case "/register-presence" :
+          return MaterialPageRoute(
+              builder: (_) => RegisterPresenceScreen(idClass: args as String)
+          );
+        case "/list-class" :
+          return MaterialPageRoute(
+              builder: (_) => ListClassScreen()
+          );
+        case "/list-presence" :
+          return MaterialPageRoute(
+              builder: (_) => ListPresenceScreen()
           );
       }
     }

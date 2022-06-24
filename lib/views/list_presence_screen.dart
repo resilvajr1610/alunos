@@ -1,36 +1,33 @@
 import '../utils/export.dart';
 
-class RegisterClassScreen extends StatefulWidget {
-  const RegisterClassScreen({Key? key}) : super(key: key);
+class ListPresenceScreen extends StatefulWidget {
+  const ListPresenceScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterClassScreen> createState() => _RegisterClassScreenState();
+  State<ListPresenceScreen> createState() => _ListPresenceScreenState();
 }
 
-class _RegisterClassScreenState extends State<RegisterClassScreen> {
+class _ListPresenceScreenState extends State<ListPresenceScreen> {
 
   var _controllerStream = StreamController<QuerySnapshot>.broadcast();
   final _controllerSearch = TextEditingController();
+  final _controllerItem = TextEditingController();
+  RegisterModel _registerModel = RegisterModel();
   FirebaseFirestore db = FirebaseFirestore.instance;
   List _allResults = [];
   List _resultsList = [];
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   Future? resultsLoaded;
 
-  _deleteClass(String id){
+  _deleteItem(String id){
     db
-        .collection('class')
+        .collection('listHistory')
         .doc(id)
-        .delete().then((value){
-      db
-          .collection('classList')
-          .doc(id)
-          .delete().then((value) => Navigator.pushReplacementNamed(context, "/register-class"));
-
-    });
+        .delete().then((value) => Navigator.pushReplacementNamed(context, "/list-presence"));
   }
 
   _data() async {
-    var data = await db.collection("classList").get();
+    var data = await db.collection("listHistory").get();
 
     setState(() {
       _allResults = data.docs;
@@ -48,7 +45,7 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
 
     if (_controllerSearch.text != "") {
       for (var items in _allResults) {
-        var brands = RegisterModel.fromSnapshot(items,'class').doc.toLowerCase();
+        var brands = RegisterModel.fromSnapshot(items,'school').doc.toLowerCase();
 
         if (brands.contains(_controllerSearch.text.toLowerCase())) {
           showResults.add(items);
@@ -60,61 +57,6 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
     setState(() {
       _resultsList = showResults;
     });
-  }
-
-  _showDialog(String id) {
-
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          double width = MediaQuery.of(context).size.width;
-          return ShowDialogCustom(
-            title: 'Atenção',
-            listContent: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                      height: 30,
-                      width: 300,
-                      child: TextCustom(
-                          text: 'Ao excluir a turma, irá excluir todos os alunos vinculados a ela. Deseja prosseguir?',
-                          color: PaletteColor.red,
-                          fontWeight: FontWeight.w700,
-                          size: 25.0,
-                      )
-                  ),
-                  SizedBox(height: 10)
-                ],
-              ),
-            ),
-            list: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15),
-                width: width*0.22,
-                height: 30,
-                child: ButtonCustom(
-                  onPressed: ()=>_deleteClass(id),
-                  text: 'Excluir',
-                ),
-              ),
-              SizedBox(width: 20),
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 15),
-                width: width*0.22,
-                height: 30,
-                child: ButtonCustom(
-                  onPressed: () => Navigator.pop(context),
-                  text: 'Cancelar',
-                  colorButton: PaletteColor.greyButtom,
-                  colorBorder: PaletteColor.greyButtom,
-                ),
-              ),
-
-            ],
-          );
-        });
   }
 
   @override
@@ -144,10 +86,11 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: PaletteColor.primaryColor,
         centerTitle: true,
-        title: TextCustom(text: 'TURMA',size: 20,color: PaletteColor.white,),
+        title: TextCustom(text: 'REGISTROS',size: 20,color: PaletteColor.white,),
       ),
       body: Container(
         padding: EdgeInsets.all(24),
@@ -157,6 +100,7 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
               children: [
                 SizedBox(width: width*0.07),
                 Input(
+                  widthCustom: 0.7,
                   controller: _controllerSearch,
                   hint: 'Pesquisar',
                   icons: Icons.search,
@@ -164,9 +108,6 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
                   sizeIcon: 25.0,
                   background: PaletteColor.white,
                   colorBorder: PaletteColor.greyBorder,
-                ),
-                SizedBox(width: width*0.05),
-                AddButtom(onPressed: ()=>Navigator.pushReplacementNamed(context,"/register-student",arguments: ""),
                 )
               ],
             ),
@@ -184,7 +125,7 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
                     case ConnectionState.done:
                       if(_resultsList.length == 0){
                         return Center(
-                            child: TextCustom(text: 'Nenhuma turma cadastrada!',size: 20.0)
+                            child: TextCustom(text: 'Nenhuma registro salvo!',size: 20.0)
                         );
                       }else {
                         return ListView.builder(
@@ -192,14 +133,14 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
                             itemBuilder: (BuildContext context, index) {
                               DocumentSnapshot item = _resultsList[index];
 
-                              String id = item['id'];
+                              String id = item["id"];
 
                               return ItemList(
                                 text: id,
-                                onTapDelete: ()=>_showDialog(id),
-                                onTapEdit: ()=>Navigator.pushNamed(context,"/register-student",arguments: id),
+                                onTapDelete: ()=>_deleteItem(id),
+                                onTapEdit: ()=> Navigator.pushNamed(context, "/register-presence",arguments: id),
                               );
-                        });
+                            });
                       }
                   }
                 },

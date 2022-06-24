@@ -34,9 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
               textColor: PaletteColor.white,
               text: 'Registrar presença',
               background: PaletteColor.primaryColor,
-              onPressed: (){
-
-              },
+              onPressed: ()=>Navigator.pushNamed(context, "/list-class"),
+            ),
+            SizedBox(height: 20),
+            CardCustom(
+              text: 'Histórico de presenças',
+              onPressed: ()=>Navigator.pushNamed(context, "/list-presence"),
             ),
           ],
         ),

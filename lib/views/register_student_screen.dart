@@ -1,7 +1,8 @@
 import '../utils/export.dart';
 
 class RegisterStudentScreen extends StatefulWidget {
-  const RegisterStudentScreen({Key? key}) : super(key: key);
+  final idClass;
+  RegisterStudentScreen({required this.idClass});
 
   @override
   State<RegisterStudentScreen> createState() => _RegisterStudentScreenState();
@@ -21,6 +22,8 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   var enable = true;
   var idClass="";
+  var stream;
+  var splitted;
 
   DropdownMenuItem<String>  buildMenuItem(String item)=>DropdownMenuItem(
     value: item,
@@ -47,8 +50,6 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
           double width = MediaQuery.of(context).size.width;
           return ShowDialogCustom(
             title: item==""?'Cadastrar Aluno':'Alterar Aluno',
-            hint: 'Nome do Aluno',
-            controller: _controllerItem,
             listContent: Container(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -59,11 +60,12 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                       child: TextCustom(text: 'Número')
                   ),
                   Input(
-                      obscure: false,
-                      keyboardType: TextInputType.number,
-                      controller: _controllerNumber,
-                      hint: '00',
-                      fonts: 20
+                    obscure: false,
+                    keyboardType: TextInputType.number,
+                    controller: _controllerNumber,
+                    hint: '00',
+                    fonts: 20,
+                    inputFormatters: [],
                   ),
                   Container(
                       height: 30,
@@ -71,11 +73,12 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                       child: TextCustom(text: 'Aluno')
                   ),
                   Input(
-                      obscure: false,
-                      keyboardType: TextInputType.text,
-                      controller: _controllerItem,
-                      hint: 'Nome do Aluno',
-                      fonts: 20
+                    obscure: false,
+                    keyboardType: TextInputType.text,
+                    controller: _controllerItem,
+                    hint: 'Nome do Aluno',
+                    fonts: 20,
+                    inputFormatters: [],
                   ),
                   SizedBox(height: 10)
                 ],
@@ -119,6 +122,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
               .collection("students")
               .doc(_controllerItem.text)
               .set({
+            'id'      :id,
             'number'  :int.parse(_controllerNumber.text),
             'student' : _controllerItem.text,
             'school'  : selectedScholl,
@@ -132,6 +136,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                 .collection(_controllerNumber.text)
                 .doc(_controllerItem.text)
                 .set({
+              'id'      :id,
               'number'  :int.parse(_controllerNumber.text),
               'student' : _controllerItem.text,
               'school'  : selectedScholl,
@@ -166,8 +171,15 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
 
   _updateItem(String number, String itemOld, String itemNew){
 
-    String idNew = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
-    print(idNew);
+    String idNew;
+    if(widget.idClass==""){
+      idNew = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
+    }else{
+      idNew = widget.idClass;
+      _controllerClass.text = splitted[0];
+      selectedPeriod = splitted[1];
+      selectedScholl = splitted[2];
+    }
 
     if(_controllerItem.text.isNotEmpty) {
       if(_controllerClass.text.isNotEmpty){
@@ -229,7 +241,12 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
 
   _deleteItem(String number,String item){
 
-    String idDelete = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
+    String idDelete;
+    if(widget.idClass==""){
+      idDelete = _controllerClass.text + ' - '+selectedPeriod+' - '+selectedScholl;
+    }else{
+      idDelete = widget.idClass;
+    }
 
     db
         .collection('students')
@@ -240,17 +257,21 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
           .doc(idDelete)
           .collection(number)
           .doc(item)
-          .delete().then((value){
-        db
-            .collection("classList")
-            .doc(idDelete)
-            .delete();
+          .delete();
       });
-    });
   }
 
   _data() async {
-    final stream = db.collection("students").where('time',isGreaterThan:DateTime.now()).snapshots();
+    if(widget.idClass!=""){
+      stream = db.collection("students").where('id',isEqualTo: widget.idClass).snapshots();
+      var string = widget.idClass;
+      splitted = string.split(' - ');
+      setState(() {
+        enable=false;
+      });
+    }else{
+      stream = db.collection("students").where('time',isGreaterThan:DateTime.now()).snapshots();
+    }
 
     stream.listen((dados) {
       _controllerStream.add(dados);
@@ -311,7 +332,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                     enable: enable,
                     widthCustom: 0.3,
                     controller: _controllerClass,
-                    hint: 'Turma',
+                    hint: widget.idClass==""?'Turma':splitted[0],
                   ),
                 ),
                 enable?Container(
@@ -348,7 +369,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                         border: Border.all(color: PaletteColor.greyBorder)
                     ),
                     child: TextCustom(
-                      text: selectedPeriod,
+                      text: widget.idClass==""?selectedPeriod:splitted[1],
                       color: PaletteColor.greyText,
                     )
                 ),
@@ -419,7 +440,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                     border: Border.all(color: PaletteColor.greyBorder)
                 ),
                 child: TextCustom(
-                  text: selectedScholl,
+                  text: widget.idClass==""?selectedScholl:splitted[2],
                   color: PaletteColor.greyText,
                 )
             ),
@@ -434,6 +455,11 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                   child: TextCustom(text: 'Alunos',size: 16.0,fontWeight: FontWeight.bold,),
                 ),
                 AddButtom(onPressed: (){
+                  if(widget.idClass!=""){
+                    _controllerClass.text = splitted[0];
+                    selectedPeriod = splitted[1];
+                    selectedScholl = splitted[2];
+                  }
                   if(_controllerClass.text.isNotEmpty){
                     if(selectedScholl!=null){
                       setState(() {
@@ -466,11 +492,9 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
 
                       if(querySnapshot.docs.length == 0){
                         return Center(
-                            child: Text('Sem dados!',style: TextStyle(fontSize: 20),)
+                            child: TextCustom(text: 'Nenhuma aluno cadastrado!',size: 20.0)
                         );
                       }else {
-
-
 
                         return ListView.builder(
                             itemCount: querySnapshot.docs.length,

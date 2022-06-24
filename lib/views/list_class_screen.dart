@@ -43,7 +43,7 @@ class _ListClassScreenState extends State<ListClassScreen> {
         padding: EdgeInsets.all(24),
         child: Column(
           children: [
-            TextCustom(text: 'Selecione uma turma para avançar',size: 20),
+            _allResults.length == 0?Container():TextCustom(text: 'Selecione uma turma para avançar',size: 20),
             SizedBox(height: 50),
             Container(
               height: height * 0.5,

@@ -506,7 +506,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                               String student = item["student"];
 
                               return ItemList(
-                                text: student,
+                                text: number+' - '+ student,
                                 onTapDelete: ()=>_deleteItem(number,student),
                                 onTapEdit: ()=>_showDialog(number,student),
                               );

@@ -92,7 +92,7 @@ class _RegisterPresenceScreenState extends State<RegisterPresenceScreen> {
   _data() async {
 
     if(splittedConvert.length ==2 ){
-      stream = db.collection("students").where('id',isEqualTo: splittedConvert[1]).snapshots();
+      stream = db.collection("students").where('id',isEqualTo: splittedConvert[1]).orderBy('number').snapshots();
       stream.listen((dados) {
         _controllerStream.add(dados);
       });
@@ -161,53 +161,21 @@ class _RegisterPresenceScreenState extends State<RegisterPresenceScreen> {
         centerTitle: true,
         title: TextCustom(text: 'REGISTRAR PRESENÇA',size: 20,color: PaletteColor.white,),
       ),
-      body: Container(
-        width: width,
-        padding: EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Container(
-              width: width,
-              margin: EdgeInsets.only(left: 10,top: 15),
-              alignment: Alignment.centerLeft,
-              child: TextCustom(text: 'Escola'),
-            ),
-            Container(
-                height: 43,
+      body: SafeArea(
+        child: Container(
+          width: width,
+          padding: EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Container(
                 width: width,
-                margin: EdgeInsets.only(left: 10,top: 5),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: PaletteColor.white,
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: PaletteColor.greyBorder)
-                ),
-                child: TextCustom(
-                  text:  scholl,
-                  color: PaletteColor.greyText,
-                )
-            ),
-            Row(
-              children: [
-                Container(
-                  width: width*0.3,
-                  margin: EdgeInsets.only(left: 10,top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'Turma'),
-                ),
-                Container(
-                  width: width*0.4,
-                  margin: EdgeInsets.only(left: 30,top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'Período'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
+                margin: EdgeInsets.only(left: 10,top: 15),
+                alignment: Alignment.centerLeft,
+                child: TextCustom(text: 'Escola'),
+              ),
+              Container(
                   height: 43,
-                  width: width*0.3,
+                  width: width,
                   margin: EdgeInsets.only(left: 10,top: 5),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -215,210 +183,244 @@ class _RegisterPresenceScreenState extends State<RegisterPresenceScreen> {
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(color: PaletteColor.greyBorder)
                   ),
-                  child: TextCustom(text: classe,color: PaletteColor.greyText,),
-                ),
-                Container(
+                  child: TextCustom(
+                    text:  scholl,
+                    color: PaletteColor.greyText,
+                  )
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: width*0.3,
+                    margin: EdgeInsets.only(left: 10,top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: TextCustom(text: 'Turma'),
+                  ),
+                  Container(
+                    width: width*0.4,
+                    margin: EdgeInsets.only(left: 30,top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: TextCustom(text: 'Período'),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
                     height: 43,
                     width: width*0.3,
-                    margin: EdgeInsets.only(left: 28,top: 5),
+                    margin: EdgeInsets.only(left: 10,top: 5),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                         color: PaletteColor.white,
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(color: PaletteColor.greyBorder)
                     ),
-                    child: TextCustom(text: period,color: PaletteColor.greyText,),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
-                  width: width*0.3,
-                  margin: EdgeInsets.only(left: 10,top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'Data'),
-                ),
-                Container(
-                  width: width*0.4,
-                  margin: EdgeInsets.only(left: 30,top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'Horário'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(left: 0,top: 5),
-                  alignment: Alignment.centerLeft,
-                  child: splittedConvert.length ==2
+                    child: TextCustom(text: classe,color: PaletteColor.greyText,),
+                  ),
+                  Container(
+                      height: 43,
+                      width: width*0.3,
+                      margin: EdgeInsets.only(left: 28,top: 5),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: PaletteColor.white,
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: PaletteColor.greyBorder)
+                      ),
+                      child: TextCustom(text: period,color: PaletteColor.greyText,),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: width*0.3,
+                    margin: EdgeInsets.only(left: 10,top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: TextCustom(text: 'Data'),
+                  ),
+                  Container(
+                    width: width*0.4,
+                    margin: EdgeInsets.only(left: 30,top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: TextCustom(text: 'Horário'),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 0,top: 5),
+                    alignment: Alignment.centerLeft,
+                    child: splittedConvert.length ==2
+                      ?Input(
+                        widthCustom: 0.3,
+                        controller: _controllerDate,
+                        hint: '00/00/0000',
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          DataInputFormatter(),
+                        ],
+                      )
+                      :Container(
+                        decoration: BoxDecoration(
+                            color: PaletteColor.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: PaletteColor.greyBorder)
+                        ),
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.only(right:  width*0.18),
+                      alignment: Alignment.centerLeft,
+                      child:TextCustom(text: date,color: PaletteColor.greyText,)
+                  ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 0,top: 5),
+                    alignment: Alignment.centerLeft,
+                    child: splittedConvert.length ==2
                     ?Input(
-                      widthCustom: 0.3,
-                      controller: _controllerDate,
-                      hint: '00/00/0000',
+                      widthCustom: 0.2,
+                      controller: _controllerStart,
+                      hint: '00:00',
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
-                        DataInputFormatter(),
+                        HoraInputFormatter(),
                       ],
                     )
                     :Container(
-                      decoration: BoxDecoration(
-                          color: PaletteColor.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: PaletteColor.greyBorder)
-                      ),
-                    padding: EdgeInsets.all(5),
-                    margin: EdgeInsets.only(right: 85),
+                        decoration: BoxDecoration(
+                            color: PaletteColor.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: PaletteColor.greyBorder)
+                        ),
+                        margin: EdgeInsets.only(right: width*0.02),
+                        padding: EdgeInsets.all(5),
+                        alignment: Alignment.centerLeft,
+                        child:TextCustom(text: hourStart,color: PaletteColor.greyText,)
+                    ),
+                  ),
+                  Container(
+                    width: 10,
                     alignment: Alignment.centerLeft,
-                    child:TextCustom(text: date,color: PaletteColor.greyText,)
-                ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 0,top: 5),
-                  alignment: Alignment.centerLeft,
-                  child: splittedConvert.length ==2
-                  ?Input(
-                    widthCustom: 0.2,
-                    controller: _controllerStart,
-                    hint: '00:00',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      HoraInputFormatter(),
-                    ],
-                  )
-                  :Container(
-                      decoration: BoxDecoration(
-                          color: PaletteColor.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: PaletteColor.greyBorder)
-                      ),
-                      margin: EdgeInsets.only(right: 20),
-                      padding: EdgeInsets.all(5),
-                      alignment: Alignment.centerLeft,
-                      child:TextCustom(text: hourStart,color: PaletteColor.greyText,)
+                    child: TextCustom(text: 'a'),
                   ),
-                ),
-                Container(
-                  width: 10,
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'a'),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 0,top: 5),
-                  alignment: Alignment.centerLeft,
-                  child: splittedConvert.length ==2
-                  ?Input(
-                    widthCustom: 0.2,
-                    controller: _controllerEnd,
-                    hint: '00:00',
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      HoraInputFormatter(),
-                    ],
-                  )
-                  :Container(
-                      decoration: BoxDecoration(
-                          color: PaletteColor.white,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: PaletteColor.greyBorder)
-                      ),
-                      margin: EdgeInsets.only(left: 20),
-                      padding: EdgeInsets.all(5),
-                      alignment: Alignment.centerLeft,
-                      child:TextCustom(text: hourEnd,color: PaletteColor.greyText,)
+                  Container(
+                    padding: EdgeInsets.only(left: 0,top: 5),
+                    alignment: Alignment.centerLeft,
+                    child: splittedConvert.length ==2
+                    ?Input(
+                      widthCustom: 0.2,
+                      controller: _controllerEnd,
+                      hint: '00:00',
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        HoraInputFormatter(),
+                      ],
+                    )
+                    :Container(
+                        decoration: BoxDecoration(
+                            color: PaletteColor.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: PaletteColor.greyBorder)
+                        ),
+                        margin: EdgeInsets.only(left:  width*0.02),
+                        padding: EdgeInsets.all(5),
+                        alignment: Alignment.centerLeft,
+                        child:TextCustom(text: hourEnd,color: PaletteColor.greyText,)
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Divider(),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              width: width,
-              alignment: Alignment.center,
-              child: TextCustom(text: 'Alunos',size: 16.0,fontWeight: FontWeight.bold,),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextCustom(text: 'Nome do Aluno',size: 16.0,fontWeight: FontWeight.bold,color: PaletteColor.greyText,),
-                  TextCustom(text: 'Presente',size: 16.0,fontWeight: FontWeight.bold,color: PaletteColor.greyText,),
                 ],
               ),
-            ),
-            Container(
-              height: height * 0.4,
-              child: splittedConvert.length ==2
-                  ?StreamBuilder(
-                stream: _controllerStream.stream,
-                builder: (context, snapshot) {
-
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return Container();
-                    case ConnectionState.active:
-                    case ConnectionState.done:
-
-                    QuerySnapshot querySnapshot = snapshot.data as QuerySnapshot;
-
-                      if(querySnapshot.docs.length == 0){
-                        return Center(
-                            child: TextCustom(text: 'Nenhuma aluno cadastrado!',size: 20.0)
-                        );
-                      }else {
-
-                        return ListView.builder(
-                            itemCount: querySnapshot.docs.length,
-                            itemBuilder: (BuildContext context, index) {
-                              List<DocumentSnapshot> items = querySnapshot.docs.toList();
-                              DocumentSnapshot item = items[index];
-
-                                int number = item["number"];
-                                String convert;
-                                if(number<10){
-                                  convert = '0'+number.toString();
-                                }else{
-                                  convert = number.toString();
-                                }
-                                var i = 0;
-                                for(i; i < querySnapshot.docs.length; i++){
-                                  itens.insert(i,CheckBoxModel(texto: item['student'],number: convert));
-                                }
-
-                              return CheckboxWidget(item: itens[index]);
-                            });
-                      }
-                  }
-                },
-              )
-                  :ListView.builder(
-                itemCount: itens.length,
-                itemBuilder: (_, int index){
-
-                  //print('value : $index leng ${itens.length} number ${itens[index].number} check ${itens[index].checked}');
-
-                  return itens[index].number!=itens[
-
-                        index!=itens.length-1?
-                        index+1:
-                        index-2].number
-
-                      ?CheckboxWidget(item: itens[index])
-                      :Container();
-                },
+              Divider(),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                width: width,
+                alignment: Alignment.center,
+                child: TextCustom(text: 'Alunos',size: 16.0,fontWeight: FontWeight.bold,),
               ),
-            ),
-            ButtonCustom(
-                onPressed: ()=>_saveFirebase(),
-                text: 'Finalizar'
-            )
-          ],
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextCustom(text: 'Nome do Aluno',size: 16.0,fontWeight: FontWeight.bold,color: PaletteColor.greyText,),
+                    TextCustom(text: 'Presente',size: 16.0,fontWeight: FontWeight.bold,color: PaletteColor.greyText,),
+                  ],
+                ),
+              ),
+              Container(
+                height: height * 0.45,
+                child: splittedConvert.length ==2
+                    ?StreamBuilder(
+                  stream: _controllerStream.stream,
+                  builder: (context, snapshot) {
+
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                        return Container();
+                      case ConnectionState.active:
+                      case ConnectionState.done:
+
+                      QuerySnapshot querySnapshot = snapshot.data as QuerySnapshot;
+
+                        if(querySnapshot.docs.length == 0){
+                          return Center(
+                              child: TextCustom(text: 'Nenhuma aluno cadastrado!',size: 20.0)
+                          );
+                        }else {
+
+                          return ListView.builder(
+                              itemCount: querySnapshot.docs.length,
+                              itemBuilder: (BuildContext context, index) {
+                                List<DocumentSnapshot> items = querySnapshot.docs.toList();
+                                DocumentSnapshot item = items[index];
+
+                                  int number = item["number"];
+                                  String convert;
+                                  if(number<10){
+                                    convert = '0'+number.toString();
+                                  }else{
+                                    convert = number.toString();
+                                  }
+                                  var i = 0;
+                                  for(i; i < querySnapshot.docs.length; i++){
+                                    itens.insert(i,CheckBoxModel(texto: item['student'],number: convert));
+                                  }
+
+                                return CheckboxWidget(item: itens[index]);
+                              });
+                        }
+                    }
+                  },
+                )
+                    :ListView.builder(
+                  itemCount: itens.length,
+                  itemBuilder: (_, int index){
+
+                    //print('value : $index leng ${itens.length} number ${itens[index].number} check ${itens[index].checked}');
+
+                    return itens[index].number!=itens[
+
+                          index!=itens.length-1?
+                          index+1:
+                          index-2].number
+
+                        ?CheckboxWidget(item: itens[index])
+                        :Container();
+                  },
+                ),
+              ),
+              ButtonCustom(
+                  onPressed: ()=>_saveFirebase(),
+                  text: 'Finalizar'
+              )
+            ],
+          ),
         ),
       ),
     );

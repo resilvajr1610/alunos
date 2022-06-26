@@ -1,6 +1,6 @@
 export 'package:flutter/material.dart';
-export 'dart:async';
 export 'package:flutter/services.dart';
+export 'dart:async';
 
 export '../models/RegisterModel.dart';
 export '../models/CheckBoxModel.dart';
@@ -33,3 +33,4 @@ export 'package:firebase_auth/firebase_auth.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:auto_size_text/auto_size_text.dart';
 export 'package:brasil_fields/brasil_fields.dart';
+export 'package:firebase_storage/firebase_storage.dart';

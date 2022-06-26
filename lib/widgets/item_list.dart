@@ -4,11 +4,13 @@ class ItemList extends StatelessWidget {
   final text;
   final onTapDelete;
   final onTapEdit;
+  final onPressedPDF;
 
   ItemList({
   required this.text,
   required this.onTapDelete,
   required this.onTapEdit,
+  this.onPressedPDF=null,
 });
 
   @override
@@ -24,7 +26,15 @@ class ItemList extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 5),
           child: Row(
             children: [
-              SizedBox(width: width*0.1),
+            onPressedPDF==null
+                ?Container(width: width*0.1)
+                :Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: IconButton(
+                    onPressed: onPressedPDF,
+                    icon: Icon(Icons.picture_as_pdf,color: PaletteColor.primaryColor,size: 30)
+              ),
+                ),
               Container(
                 width: width*0.55,
                 child: TextCustom(text: text,color: PaletteColor.greyText,size: 16.0,)

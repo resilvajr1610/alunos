@@ -1,3 +1,5 @@
+import 'package:alunos/models/pdf_model.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../utils/export.dart';
 
 class ListPresenceScreen extends StatefulWidget {
@@ -11,13 +13,14 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
 
   var _controllerStream = StreamController<QuerySnapshot>.broadcast();
   final _controllerSearch = TextEditingController();
-  final _controllerItem = TextEditingController();
-  RegisterModel _registerModel = RegisterModel();
   FirebaseFirestore db = FirebaseFirestore.instance;
   List _allResults = [];
   List _resultsList = [];
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   Future? resultsLoaded;
+  var listFirebase=[];
+  List<CheckBoxModel> itens=[];
+  var removeItems;
 
   _deleteItem(String id){
     db
@@ -57,6 +60,78 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
     setState(() {
       _resultsList = showResults;
     });
+  }
+
+  _createPdf(id)async{
+
+    var splitted = id.split(' - ');
+
+    var date   = splitted[0];
+    var hour   = splitted[1];
+    var classe = splitted[2];
+    var period = splitted[3];
+    var scholl = splitted[4];
+
+
+    DocumentSnapshot snapshot = await db.collection("listHistory").doc(id).get();
+    Map<String,dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+    setState(() {
+      listFirebase = data?["list"]??"";
+      listFirebase.sort((a,b) => a.compareTo(b));
+      //int i = 0;
+      // for(i; i < listFirebase.length; i++){
+      //   var splitted = listFirebase[i].toString().replaceAll("- ", '').split('#');
+      //   var number = splitted[0];
+      //   var name = splitted[1];
+      //   var check = splitted[2];
+      //   itens.insert(i,CheckBoxModel(texto: name,number: number,checked: check=='true'?true:false));
+      //   listFirebase[i]==listFirebase[listFirebase.length==i?i-1:i]?listFirebase.removeAt(i):listFirebase.add(listFirebase[i]);
+      //   print(itens[i].number);
+      // }
+
+      //removeItems = listFirebase.toSet().toList();
+      //print(listFirebase);
+    });
+
+    PdfDocument document = PdfDocument();
+    final page = document.pages.add();
+
+    PdfGrid grid = PdfGrid();
+
+    grid.columns.add(count: 3);
+    grid.headers.add(1);
+
+    int i = 0;
+    for(i; i < listFirebase.length; i++){
+      var splitted = listFirebase[i].toString().replaceAll("- ", '').split('#');
+      var number = splitted[0];
+      var name = splitted[1];
+      var check = splitted[2];
+
+      itens.insert(i,CheckBoxModel(texto: name,number: number,checked: check=='true'?true:false));
+      //listFirebase[i]==listFirebase[listFirebase.length==i?i-1:i]?listFirebase.removeAt(i):listFirebase.add(listFirebase[i]);
+      itens[i].number==itens[listFirebase.length==i?i-1:i].number?listFirebase.removeAt(i):listFirebase.add(listFirebase[i]);
+      print(listFirebase[i]);
+
+      double line = 20.0*i+20;
+
+      line.toInt();
+
+      page.graphics.drawString('$number - $name',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(0,line,500,50));
+      page.graphics.drawString('Presença : ${check=='true'?'presente':'ausente'}',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(400,line,700,50));
+    }
+
+    page.graphics.drawString('Dia : $date',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(0,0,500,50));
+    page.graphics.drawString('Horário : $hour',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(100,0,400,50));
+    page.graphics.drawString('Turma : $classe',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(180,0,400,50));
+    page.graphics.drawString('Período : $period',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(260,0,500,50));
+    page.graphics.drawString('Escola : $scholl',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(360,0,600,50));
+
+    List<int> bytes = document.save();
+    document.dispose();
+
+    saveAndLaunhFile(bytes, 'output.pdf');
+
   }
 
   @override
@@ -113,7 +188,7 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
             ),
             SizedBox(height: 10),
             Container(
-              height: height * 0.5,
+              height: height * 0.8,
               child: StreamBuilder(
                 stream: _controllerStream.stream,
                 builder: (context, snapshot) {
@@ -139,6 +214,7 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
                                 text: id,
                                 onTapDelete: ()=>_deleteItem(id),
                                 onTapEdit: ()=> Navigator.pushNamed(context, "/register-presence",arguments: id),
+                                onPressedPDF: ()=>_createPdf(id),
                               );
                             });
                       }

@@ -263,7 +263,7 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
 
   _data() async {
     if(widget.idClass!=""){
-      stream = db.collection("students").where('id',isEqualTo: widget.idClass).snapshots();
+      stream = db.collection("students").where('id',isEqualTo: widget.idClass).orderBy('number').snapshots();
       var string = widget.idClass;
       splitted = string.split(' - ');
       setState(() {
@@ -302,63 +302,41 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
         centerTitle: true,
         title: TextCustom(text: 'ALUNOS',size: 20,color: PaletteColor.white,),
       ),
-      body: Container(
-        width: width,
-        padding: EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: width*0.3,
-                  margin: EdgeInsets.only(left: 10,top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'Turma'),
-                ),
-                Container(
-                  width: width*0.4,
-                  margin: EdgeInsets.only(left: 30,top: 15),
-                  alignment: Alignment.centerLeft,
-                  child: TextCustom(text: 'Período'),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(left: 0,top: 5),
-                  alignment: Alignment.centerLeft,
-                  child: Input(
-                    enable: enable,
-                    widthCustom: 0.3,
-                    controller: _controllerClass,
-                    hint: widget.idClass==""?'Turma':splitted[0],
+      body: SafeArea(
+        child: Container(
+          width: width,
+          padding: EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: width*0.3,
+                    margin: EdgeInsets.only(left: 10,top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: TextCustom(text: 'Turma'),
                   ),
-                ),
-                enable?Container(
-                  height: 43,
-                  width: width*0.3,
-                  margin: EdgeInsets.only(left: 24,top: 5),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: PaletteColor.white,
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: PaletteColor.greyBorder)
+                  Container(
+                    width: width*0.4,
+                    margin: EdgeInsets.only(left: 30,top: 15),
+                    alignment: Alignment.centerLeft,
+                    child: TextCustom(text: 'Período'),
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      isExpanded: true,
-                      alignment: Alignment.center,
-                      value: selectedPeriod,
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12
-                      ),
-                      items: listPeriod.map(buildMenuItem).toList(),
-                      onChanged: (value) => setState(() => selectedPeriod = value.toString()),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 0,top: 5),
+                    alignment: Alignment.centerLeft,
+                    child: Input(
+                      enable: enable,
+                      widthCustom: 0.3,
+                      controller: _controllerClass,
+                      hint: widget.idClass==""?'Turma':splitted[0],
                     ),
                   ),
-                ):Container(
+                  enable?Container(
                     height: 43,
                     width: width*0.3,
                     margin: EdgeInsets.only(left: 24,top: 5),
@@ -368,68 +346,43 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                         borderRadius: BorderRadius.circular(5),
                         border: Border.all(color: PaletteColor.greyBorder)
                     ),
-                    child: TextCustom(
-                      text: widget.idClass==""?selectedPeriod:splitted[1],
-                      color: PaletteColor.greyText,
-                    )
-                ),
-              ],
-            ),
-            Container(
-              width: width,
-              margin: EdgeInsets.only(left: 10,top: 15),
-              alignment: Alignment.centerLeft,
-              child: TextCustom(text: 'Escola'),
-            ),
-            enable?Container(
-              height: 43,
-              width: width,
-              margin: EdgeInsets.only(left: 10,top: 5),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: PaletteColor.white,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: PaletteColor.greyBorder)
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        isExpanded: true,
+                        alignment: Alignment.center,
+                        value: selectedPeriod,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12
+                        ),
+                        items: listPeriod.map(buildMenuItem).toList(),
+                        onChanged: (value) => setState(() => selectedPeriod = value.toString()),
+                      ),
+                    ),
+                  ):Container(
+                      height: 43,
+                      width: width*0.3,
+                      margin: EdgeInsets.only(left: 24,top: 5),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: PaletteColor.white,
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: PaletteColor.greyBorder)
+                      ),
+                      child: TextCustom(
+                        text: widget.idClass==""?selectedPeriod:splitted[1],
+                        color: PaletteColor.greyText,
+                      )
+                  ),
+                ],
               ),
-              child: DropdownButtonHideUnderline(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream:FirebaseFirestore.instance.collection('schools').snapshots(),
-                  builder: (context,snapshot){
-
-                        if(!snapshot.hasData){
-                          return Container();
-                        }else {
-                          List<DropdownMenuItem> espItems = [];
-                          for (int i = 0; i < snapshot.data!.docs.length;i++){
-                            DocumentSnapshot snap=snapshot.data!.docs[i];
-                            espItems.add(
-                                DropdownMenuItem(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: TextCustom(
-                                      text:  snap.id,
-                                      color: PaletteColor.greyText,
-                                    ),
-                                  ),
-                                  value: "${snap.id}",
-                                )
-                            );
-                          }
-                          return DropdownButton<dynamic>(
-                            isExpanded: true,
-                            value: selectedScholl,
-                            items: espItems,
-                            onChanged: (value){
-                              setState(() {
-                                selectedScholl = value.toString();
-                              });
-                            },
-                          );
-                        }
-                  },
-                )
-              )
-            ):Container(
+              Container(
+                width: width,
+                margin: EdgeInsets.only(left: 10,top: 15),
+                alignment: Alignment.centerLeft,
+                child: TextCustom(text: 'Escola'),
+              ),
+              enable?Container(
                 height: 43,
                 width: width,
                 margin: EdgeInsets.only(left: 10,top: 5),
@@ -439,84 +392,133 @@ class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: PaletteColor.greyBorder)
                 ),
-                child: TextCustom(
-                  text: widget.idClass==""?selectedScholl:splitted[2],
-                  color: PaletteColor.greyText,
-                )
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(),
-                Container(
-                  padding: EdgeInsets.all(20),
-                  width: width*0.3,
-                  alignment: Alignment.center,
-                  child: TextCustom(text: 'Alunos',size: 16.0,fontWeight: FontWeight.bold,),
-                ),
-                AddButtom(onPressed: (){
-                  if(widget.idClass!=""){
-                    _controllerClass.text = splitted[0];
-                    selectedPeriod = splitted[1];
-                    selectedScholl = splitted[2];
-                  }
-                  if(_controllerClass.text.isNotEmpty){
-                    if(selectedScholl!=null){
-                      setState(() {
-                        enable=false;
-                      });
-                      _showDialog('','');
-                    }else{
-                      showSnackBar(context, "Selecione a escola", _scaffoldKey);
-                    }
-                  }else{
-                    showSnackBar(context, "Nome da turma está vazio", _scaffoldKey);
-                  }
-                }),
-              ],
-            ),
-            Container(
-              height: height * 0.5,
-              child: StreamBuilder(
-                stream: _controllerStream.stream,
-                builder: (context, snapshot) {
+                child: DropdownButtonHideUnderline(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream:FirebaseFirestore.instance.collection('schools').snapshots(),
+                    builder: (context,snapshot){
 
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                      return Container();
-                    case ConnectionState.active:
-                    case ConnectionState.done:
-
-                    QuerySnapshot querySnapshot = snapshot.data as QuerySnapshot;
-
-                      if(querySnapshot.docs.length == 0){
-                        return Center(
-                            child: TextCustom(text: 'Nenhuma aluno cadastrado!',size: 20.0)
-                        );
-                      }else {
-
-                        return ListView.builder(
-                            itemCount: querySnapshot.docs.length,
-                            itemBuilder: (BuildContext context, index) {
-                              List<DocumentSnapshot> items = querySnapshot.docs.toList();
-                              DocumentSnapshot item = items[index];
-
-                              String number = item["number"].toString();
-                              String student = item["student"];
-
-                              return ItemList(
-                                text: number+' - '+ student,
-                                onTapDelete: ()=>_deleteItem(number,student),
-                                onTapEdit: ()=>_showDialog(number,student),
+                          if(!snapshot.hasData){
+                            return Container();
+                          }else {
+                            List<DropdownMenuItem> espItems = [];
+                            for (int i = 0; i < snapshot.data!.docs.length;i++){
+                              DocumentSnapshot snap=snapshot.data!.docs[i];
+                              espItems.add(
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                      child: TextCustom(
+                                        text:  snap.id,
+                                        color: PaletteColor.greyText,
+                                      ),
+                                    ),
+                                    value: "${snap.id}",
+                                  )
                               );
-                            });
-                      }
-                  }
-                },
+                            }
+                            return DropdownButton<dynamic>(
+                              isExpanded: true,
+                              value: selectedScholl,
+                              items: espItems,
+                              onChanged: (value){
+                                setState(() {
+                                  selectedScholl = value.toString();
+                                });
+                              },
+                            );
+                          }
+                    },
+                  )
+                )
+              ):Container(
+                  height: 43,
+                  width: width,
+                  margin: EdgeInsets.only(left: 10,top: 5),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: PaletteColor.white,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: PaletteColor.greyBorder)
+                  ),
+                  child: TextCustom(
+                    text: widget.idClass==""?selectedScholl:splitted[2],
+                    color: PaletteColor.greyText,
+                  )
               ),
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    width: width*0.3,
+                    alignment: Alignment.center,
+                    child: TextCustom(text: 'Alunos',size: 16.0,fontWeight: FontWeight.bold,),
+                  ),
+                  AddButtom(onPressed: (){
+                    if(widget.idClass!=""){
+                      _controllerClass.text = splitted[0];
+                      selectedPeriod = splitted[1];
+                      selectedScholl = splitted[2];
+                    }
+                    if(_controllerClass.text.isNotEmpty){
+                      if(selectedScholl!=null){
+                        setState(() {
+                          enable=false;
+                        });
+                        _showDialog('','');
+                      }else{
+                        showSnackBar(context, "Selecione a escola", _scaffoldKey);
+                      }
+                    }else{
+                      showSnackBar(context, "Nome da turma está vazio", _scaffoldKey);
+                    }
+                  }),
+                ],
+              ),
+              Container(
+                height: height * 0.6,
+                child: StreamBuilder(
+                  stream: _controllerStream.stream,
+                  builder: (context, snapshot) {
+
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                        return Container();
+                      case ConnectionState.active:
+                      case ConnectionState.done:
+
+                      QuerySnapshot querySnapshot = snapshot.data as QuerySnapshot;
+
+                        if(querySnapshot.docs.length == 0){
+                          return Center(
+                              child: TextCustom(text: 'Nenhuma aluno cadastrado!',size: 20.0)
+                          );
+                        }else {
+
+                          return ListView.builder(
+                              itemCount: querySnapshot.docs.length,
+                              itemBuilder: (BuildContext context, index) {
+                                List<DocumentSnapshot> items = querySnapshot.docs.toList();
+                                DocumentSnapshot item = items[index];
+
+                                String number = item["number"].toString();
+                                String student = item["student"];
+
+                                return ItemList(
+                                  text: number+' - '+ student,
+                                  onTapDelete: ()=>_deleteItem(number,student),
+                                  onTapEdit: ()=>_showDialog(number,student),
+                                );
+                              });
+                        }
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

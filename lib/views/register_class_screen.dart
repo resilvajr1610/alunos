@@ -149,63 +149,65 @@ class _RegisterClassScreenState extends State<RegisterClassScreen> {
         centerTitle: true,
         title: TextCustom(text: 'TURMA',size: 20,color: PaletteColor.white,),
       ),
-      body: Container(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                SizedBox(width: width*0.07),
-                Input(
-                  controller: _controllerSearch,
-                  hint: 'Pesquisar',
-                  icons: Icons.search,
-                  colorIcon: PaletteColor.primaryColor,
-                  sizeIcon: 25.0,
-                  background: PaletteColor.white,
-                  colorBorder: PaletteColor.greyBorder,
-                ),
-                SizedBox(width: width*0.05),
-                AddButtom(onPressed: ()=>Navigator.pushReplacementNamed(context,"/register-student",arguments: ""),
-                )
-              ],
-            ),
-            SizedBox(height: 10),
-            Container(
-              height: height * 0.5,
-              child: StreamBuilder(
-                stream: _controllerStream.stream,
-                builder: (context, snapshot) {
-
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                    case ConnectionState.done:
-                      if(_resultsList.length == 0){
-                        return Center(
-                            child: TextCustom(text: 'Nenhuma turma cadastrada!',size: 20.0)
-                        );
-                      }else {
-                        return ListView.builder(
-                            itemCount: _resultsList.length,
-                            itemBuilder: (BuildContext context, index) {
-                              DocumentSnapshot item = _resultsList[index];
-
-                              String id = item['id'];
-
-                              return ItemList(
-                                text: id,
-                                onTapDelete: ()=>_showDialog(id),
-                                onTapEdit: ()=>Navigator.pushNamed(context,"/register-student",arguments: id),
-                              );
-                        });
-                      }
-                  }
-                },
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  SizedBox(width: width*0.07),
+                  Input(
+                    controller: _controllerSearch,
+                    hint: 'Pesquisar',
+                    icons: Icons.search,
+                    colorIcon: PaletteColor.primaryColor,
+                    sizeIcon: 25.0,
+                    background: PaletteColor.white,
+                    colorBorder: PaletteColor.greyBorder,
+                  ),
+                  SizedBox(width: width*0.05),
+                  AddButtom(onPressed: ()=>Navigator.pushReplacementNamed(context,"/register-student",arguments: ""),
+                  )
+                ],
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Container(
+                height: height * 0.8,
+                child: StreamBuilder(
+                  stream: _controllerStream.stream,
+                  builder: (context, snapshot) {
+
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
+                      case ConnectionState.done:
+                        if(_resultsList.length == 0){
+                          return Center(
+                              child: TextCustom(text: 'Nenhuma turma cadastrada!',size: 20.0)
+                          );
+                        }else {
+                          return ListView.builder(
+                              itemCount: _resultsList.length,
+                              itemBuilder: (BuildContext context, index) {
+                                DocumentSnapshot item = _resultsList[index];
+
+                                String id = item['id'];
+
+                                return ItemList(
+                                  text: id,
+                                  onTapDelete: ()=>_showDialog(id),
+                                  onTapEdit: ()=>Navigator.pushNamed(context,"/register-student",arguments: id),
+                                );
+                          });
+                        }
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

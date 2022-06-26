@@ -118,7 +118,7 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
       line.toInt();
 
       page.graphics.drawString('$number - $name',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(0,line,500,50));
-      page.graphics.drawString('Presença : ${check=='true'?'presente':'ausente'}',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(400,line,700,50));
+      page.graphics.drawString('Presença : ${check=='true'?'P':'F'}',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(400,line,700,50),brush: check=='true'?PdfBrushes.blue:PdfBrushes.red);
     }
 
     page.graphics.drawString('Dia : $date',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(0,0,500,50));

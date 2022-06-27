@@ -16,7 +16,7 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
     return CheckboxListTile(
       side: BorderSide(color: PaletteColor.primaryColor,width: 2),
       activeColor: PaletteColor.primaryColor,
-      title: TextCustom(text:widget.item.number+' - '+ widget.item.texto,color: PaletteColor.greyText,),
+      title: TextCustom(text:widget.item.number+' - '+ widget.item.student,color: PaletteColor.greyText,),
       value: widget.item.checked,
       onChanged: (value){
         setState((){

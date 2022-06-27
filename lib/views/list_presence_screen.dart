@@ -78,28 +78,10 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
     setState(() {
       listFirebase = data?["list"]??"";
       listFirebase.sort((a,b) => a.compareTo(b));
-      //int i = 0;
-      // for(i; i < listFirebase.length; i++){
-      //   var splitted = listFirebase[i].toString().replaceAll("- ", '').split('#');
-      //   var number = splitted[0];
-      //   var name = splitted[1];
-      //   var check = splitted[2];
-      //   itens.insert(i,CheckBoxModel(texto: name,number: number,checked: check=='true'?true:false));
-      //   listFirebase[i]==listFirebase[listFirebase.length==i?i-1:i]?listFirebase.removeAt(i):listFirebase.add(listFirebase[i]);
-      //   print(itens[i].number);
-      // }
-
-      //removeItems = listFirebase.toSet().toList();
-      //print(listFirebase);
     });
 
     PdfDocument document = PdfDocument();
     final page = document.pages.add();
-
-    PdfGrid grid = PdfGrid();
-
-    grid.columns.add(count: 3);
-    grid.headers.add(1);
 
     int i = 0;
     for(i; i < listFirebase.length; i++){
@@ -107,14 +89,10 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
       var number = splitted[0];
       var name = splitted[1];
       var check = splitted[2];
-
-      itens.insert(i,CheckBoxModel(texto: name,number: number,checked: check=='true'?true:false));
-      //listFirebase[i]==listFirebase[listFirebase.length==i?i-1:i]?listFirebase.removeAt(i):listFirebase.add(listFirebase[i]);
-      itens[i].number==itens[listFirebase.length==i?i-1:i].number?listFirebase.removeAt(i):listFirebase.add(listFirebase[i]);
-      print(listFirebase[i]);
+      itens.insert(i,CheckBoxModel(student: name,number: number,checked: check=='true'?true:false));
+      itens[i].number==itens[listFirebase.length==i?i-1:i].number?listFirebase.removeAt(listFirebase.length==i?i-1:i):listFirebase.add(listFirebase[listFirebase.length==i?i-1:i]);
 
       double line = 20.0*i+20;
-
       line.toInt();
 
       page.graphics.drawString('$number - $name',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(0,line,500,50));
@@ -130,7 +108,7 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
     List<int> bytes = document.save();
     document.dispose();
 
-    saveAndLaunhFile(bytes, 'output.pdf');
+    saveAndLaunhFile(bytes, 'dia_$date.pdf');
 
   }
 

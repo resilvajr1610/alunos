@@ -58,7 +58,7 @@ class _RegisterPresenceScreenState extends State<RegisterPresenceScreen> {
 
           for(var i=0; i < itens.length; i++){
 
-            listSave.add(itens[i].number+'#'+itens[i].texto+'#'+itens[i].checked.toString(),);
+            listSave.add(itens[i].number+'#'+itens[i].student+'#'+itens[i].checked.toString(),);
           }
           removeItems = listSave.toSet().toList();
 
@@ -115,7 +115,7 @@ class _RegisterPresenceScreenState extends State<RegisterPresenceScreen> {
           var number = splitted[0];
           var name = splitted[1];
           var check = splitted[2];
-          itens.insert(i,CheckBoxModel(texto: name,number: number,checked: check=='true'?true:false));
+          itens.insert(i,CheckBoxModel(student: name,number: number,checked: check=='true'?true:false));
         }
 
       });
@@ -389,7 +389,7 @@ class _RegisterPresenceScreenState extends State<RegisterPresenceScreen> {
                                   }
                                   var i = 0;
                                   for(i; i < querySnapshot.docs.length; i++){
-                                    itens.insert(i,CheckBoxModel(texto: item['student'],number: convert));
+                                    itens.insert(i,CheckBoxModel(student: item['student'],number: convert));
                                   }
 
                                 return CheckboxWidget(item: itens[index]);

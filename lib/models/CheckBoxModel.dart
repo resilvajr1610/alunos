@@ -1,10 +1,10 @@
 class CheckBoxModel{
-  String texto;
+  String student;
   String number;
   bool checked;
 
   CheckBoxModel({
-    required this.texto,
+    required this.student,
     required this.number,
     this.checked = false
   });

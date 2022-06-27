@@ -72,7 +72,6 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
     var period = splitted[3];
     var scholl = splitted[4];
 
-
     DocumentSnapshot snapshot = await db.collection("listHistory").doc(id).get();
     Map<String,dynamic>? data = snapshot.data() as Map<String, dynamic>?;
     setState(() {
@@ -92,7 +91,7 @@ class _ListPresenceScreenState extends State<ListPresenceScreen> {
       itens.insert(i,CheckBoxModel(student: name,number: number,checked: check=='true'?true:false));
       itens[i].number==itens[listFirebase.length==i?i-1:i].number?listFirebase.removeAt(listFirebase.length==i?i-1:i):listFirebase.add(listFirebase[listFirebase.length==i?i-1:i]);
 
-      double line = 20.0*i+20;
+      double line = 18.0*i+18;
       line.toInt();
 
       page.graphics.drawString('$number - $name',PdfStandardFont(PdfFontFamily.helvetica, 10),bounds: Rect.fromLTWH(0,line,500,50));
